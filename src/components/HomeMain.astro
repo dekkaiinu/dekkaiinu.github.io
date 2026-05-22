@@ -7,38 +7,46 @@ interface Props {
 
 const { lang } = Astro.props;
 const tt = t[lang];
-const aff = tt.affiliation;
 ---
 
 <main class="home">
   <img class="photo" src="/images/photo.gif" alt="" />
   <div class="home-text">
-    <p class="affiliation">
-      {
-        aff.parts.map((part, i) => (
-          <Fragment>
-            {i > 0 ? aff.separator : ''}
-            {part.url ? (
-              <a href={part.url} target="_blank" rel="noopener noreferrer">{part.text}</a>
-            ) : (
-              part.text
-            )}
-          </Fragment>
-        ))
-      }
-    </p>
     <p class="intro">{tt.intro}</p>
-    <ul class="links">
-      {
-        profile.links.map((l) => (
-          <li>
-            <a href={l.url} target="_blank" rel="noopener noreferrer">
-              {l.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+
+    <section class="block">
+      <h2 class="block-title">{tt.sections.contact}</h2>
+      <p class="contact">
+        <a href={`mailto:${profile.email}`}>{profile.email}</a>
+      </p>
+    </section>
+
+    <section class="block">
+      <h2 class="block-title">{tt.sections.links}</h2>
+      <ul class="links">
+        {
+          profile.links.map((l) => (
+            <li>
+              <a href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2 class="block-title">{tt.sections.career}</h2>
+      <ul class="career">
+        {
+          tt.career.map((c) => (
+            <li class="career-item">
+              <span class="career-period">{c.period}</span>
+              <span class="career-org">{c.org}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
   </div>
 </main>
 
@@ -62,17 +70,31 @@ const aff = tt.affiliation;
   }
 
   .home-text {
+    flex: 1;
     min-width: 0;
   }
 
-  .affiliation {
-    margin: 0 0 18px;
-    color: var(--color-muted);
-    font-size: 0.95rem;
+  .intro {
+    margin: 0 0 32px;
   }
 
-  .intro {
-    margin: 0 0 22px;
+  .block {
+    margin: 0 0 28px;
+  }
+
+  .block:last-child {
+    margin-bottom: 0;
+  }
+
+  .block-title {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+  .contact {
+    margin: 0;
   }
 
   .links {
@@ -81,7 +103,33 @@ const aff = tt.affiliation;
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
+  }
+
+  .career {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .career-item {
+    display: flex;
+    gap: 16px;
+  }
+
+  .career-period {
+    flex-shrink: 0;
+    width: 150px;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .career-org {
+    min-width: 0;
   }
 
   @media (max-width: 560px) {
@@ -92,6 +140,15 @@ const aff = tt.affiliation;
 
     .photo {
       width: 120px;
+    }
+
+    .career-item {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .career-period {
+      width: auto;
     }
   }
 </style>

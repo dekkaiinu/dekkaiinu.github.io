@@ -2,16 +2,18 @@
 export const languages = ['jp', 'en'] as const;
 export type Lang = (typeof languages)[number];
 
-/** 関連リンク */
-const LAB_URL = 'https://033lab.org/';
-const UNIV_URL = 'https://www.dendai.ac.jp/en/graduate/graduateadvanced.html';
-
 /** 言語に依存しないプロフィール情報 */
 export const profile = {
-  name: 'Youta Noboru / 昇 洋太',
-  /** 外部リンク: ここに追記すれば自動で増やせます */
+  /** 名前: ヘッダーで英字・日本語を分けて表示 */
+  name: { en: 'Youta Noboru', ja: '昇 洋太' },
+  /** ページタイトル等で使う氏名 */
+  fullName: 'Youta Noboru / 昇 洋太',
+  /** 連絡先メールアドレス */
+  email: '26udc07@ms.dendai.ac.jp',
+  /** リンク: ここに追記すれば自動で増やせます */
   links: [
     { url: 'https://github.com/dekkaiinu', label: 'github.com/dekkaiinu' },
+    { url: 'https://033lab.org/', label: '033lab.org' },
   ],
 };
 
@@ -34,14 +36,15 @@ export const pubUI = {
   link: 'Link',
 };
 
-/** 所属表記の1要素（url を持つ要素はリンクになる） */
-export type AffiliationPart = { text: string; url?: string };
+/** 経歴の1項目 */
+export type CareerEntry = { period: string; org: string };
 
 type LangText = {
   htmlLang: string;
-  /** affiliation: parts を separator で連結して表示。url 付き要素はリンク化 */
-  affiliation: { separator: string; parts: AffiliationPart[] };
   intro: string;
+  sections: { contact: string; links: string; career: string };
+  /** 経歴: 年月降順で記載 */
+  career: CareerEntry[];
   nav: { home: string; publication: string };
 };
 
@@ -49,35 +52,58 @@ type LangText = {
 export const t: Record<Lang, LangText> = {
   jp: {
     htmlLang: 'ja',
-    affiliation: {
-      separator: ' ',
-      parts: [
-        { text: '東京電機大学大学院', url: UNIV_URL },
-        { text: '先端科学技術研究科' },
-        { text: '情報通信メディア専攻' },
-        { text: '知覚情報処理研究室', url: LAB_URL },
-        { text: '博士1年' },
-      ],
-    },
     intro: '画像とAIの研究をしてます．',
+    sections: { contact: '連絡先', links: 'リンク', career: '経歴' },
+    career: [
+      {
+        period: '2026/06〜',
+        org: '東京電機大学 先端科学技術研究科 情報通信メディア専攻',
+      },
+      {
+        period: '2026/04〜',
+        org: '産業技術総合研究所（AIST） 技術研修インターンシップ',
+      },
+      {
+        period: '2025/04〜',
+        org: '株式会社セルシス 研究開発課 インターンシップ',
+      },
+      {
+        period: '2024/04〜2026/03',
+        org: '東京電機大学 システムデザイン工学研究科 情報システム工学専攻（修士）',
+      },
+      {
+        period: '2024/01〜2025/12',
+        org: '国立がん研究センター 生物情報学分野 特任研究補助員',
+      },
+    ],
     nav: { home: 'Home', publication: 'Publication' },
   },
   en: {
     htmlLang: 'en',
-    affiliation: {
-      separator: ', ',
-      parts: [
-        { text: 'D1' },
-        {
-          text: 'Visual Perception & Recognition Laboratory (033Lab)',
-          url: LAB_URL,
-        },
-        { text: 'Information, Communication and Media Design Engineering' },
-        { text: 'Graduate School of Advanced Science and Technology' },
-        { text: 'Tokyo Denki University', url: UNIV_URL },
-      ],
-    },
     intro: 'I research images and AI.',
+    sections: { contact: 'Contact', links: 'Links', career: 'Career' },
+    career: [
+      {
+        period: '2026/06 – Present',
+        org: 'Information, Communication and Media Design Engineering, Graduate School of Advanced Science and Technology, Tokyo Denki University',
+      },
+      {
+        period: '2026/04 – Present',
+        org: 'Technical Training Internship, National Institute of Advanced Industrial Science and Technology (AIST)',
+      },
+      {
+        period: '2025/04 – Present',
+        org: 'Internship, Research and Development Division, CELSYS, Inc.',
+      },
+      {
+        period: '2024/04 – 2026/03',
+        org: "Master's, Information System Engineering, Graduate School of System Design and Technology, Tokyo Denki University",
+      },
+      {
+        period: '2024/01 – 2025/12',
+        org: 'Research Assistant, Division of Bioinformatics, National Cancer Center Research Institute',
+      },
+    ],
     nav: { home: 'Home', publication: 'Publication' },
   },
 };
