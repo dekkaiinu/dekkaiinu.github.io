@@ -35,24 +35,27 @@ const formatDate = (d: Date) =>
       <option value="__all">{pubUI.all}</option>
       {tagFilters.map((f) => <option value={f.value}>{f.label}</option>)}
     </select>
-    <label class="size-control">
-      <span>{pubUI.size}</span>
-      <input type="range" id="size-slider" min="150" max="420" step="10" value="240" />
-    </label>
+    <div class="size-control">
+      <span class="size-sign" aria-hidden="true">−</span>
+      <input type="range" id="size-slider" min="150" max="420" step="10" value="240" aria-label="size" />
+      <span class="size-sign" aria-hidden="true">+</span>
+    </div>
   </div>
 </Header>
 
-<div class="pub-layout">
+<div class="pub-main">
+  {/* Justified ギャラリー: カードはコンテンツ枠の全幅を使用 */}
   <main class="gallery" id="gallery">
     {
       publications.map((p) => (
         <a
           class="card"
           href={p.data.link}
-          target="_blank"
-          rel="noopener noreferrer"
+          target={p.data.link ? '_blank' : undefined}
+          rel={p.data.link ? 'noopener noreferrer' : undefined}
           data-id={p.id}
           data-tags={p.data.tag.join(' ')}
+          data-aspect={(p.data.image.width / p.data.image.height).toFixed(4)}
         >
           <Image class="card-img" src={p.data.image} alt={p.data.title} />
           <div class="card-meta">
@@ -67,38 +70,43 @@ const formatDate = (d: Date) =>
       ))
     }
   </main>
-
-  <aside class="detail-sidebar">
-    <div class="detail-inner">
-      <p class="detail-empty" id="detail-empty">{pubUI.empty}</p>
-      {
-        entries.map(({ entry, Content }) => (
-          <div class="detail-panel" data-id={entry.id} hidden>
-            <p class="detail-title">{entry.data.title}</p>
-            <dl class="detail-list">
-              <dt>{pubUI.tags}</dt>
-              <dd>{entry.data.tag.join(', ')}</dd>
-              <dt>{pubUI.date}</dt>
-              <dd>{formatDate(entry.data.date)}</dd>
-              <dt>{pubUI.link}</dt>
-              <dd>
-                <a href={entry.data.link} target="_blank" rel="noopener noreferrer">
-                  {entry.data.link}
-                </a>
-              </dd>
-            </dl>
-            <div class="detail-body">
-              <Content />
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </aside>
 </div>
 
+{/* 詳細パネル: position:fixed。広い画面=右余白 / 狭い画面=下部シート */}
+<aside class="detail" id="detail">
+  <button type="button" class="detail-close" id="detail-close" aria-label="閉じる">×</button>
+  <div class="detail-scroll">
+    {
+      entries.map(({ entry, Content }) => (
+        <div class="detail-panel" data-id={entry.id} hidden>
+          <p class="detail-title">{entry.data.title}</p>
+          <dl class="detail-list">
+            <dt>{pubUI.tags}</dt>
+            <dd>{entry.data.tag.join(', ')}</dd>
+            <dt>{pubUI.date}</dt>
+            <dd>{formatDate(entry.data.date)}</dd>
+            {entry.data.link && (
+              <Fragment>
+                <dt>{pubUI.link}</dt>
+                <dd>
+                  <a href={entry.data.link} target="_blank" rel="noopener noreferrer">
+                    {entry.data.link}
+                  </a>
+                </dd>
+              </Fragment>
+            )}
+          </dl>
+          <div class="detail-body">
+            <Content />
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</aside>
+
 <style>
-  /* --- ヘッダ内のコントロール（タグドロップダウン + サイズスライダー） --- */
+  /* --- ヘッダ内のコントロール（タグドロップダウン + サイズバー） --- */
   .pub-controls {
     display: flex;
     align-items: center;
@@ -123,38 +131,44 @@ const formatDate = (d: Date) =>
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.85rem;
     color: var(--color-muted);
-    white-space: nowrap;
   }
 
-  /* --- 本体レイアウト（ギャラリー + 詳細サイドバー）。ヘッダーと同じ最大幅 --- */
-  .pub-layout {
+  .size-sign {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  #size-slider {
+    width: 140px;
+    accent-color: var(--color-muted);
+  }
+
+  /* --- ギャラリー本体（コンテンツ枠の全幅） --- */
+  .pub-main {
     max-width: var(--site-width);
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 24px;
     padding: 20px 24px;
-    align-items: start;
   }
 
-  /* ページ幅ぴったりに充填する可変グリッド。--card-size をスライダーで変更 */
+  /* Justified レイアウト: 各カード幅は JS が設定し、行の高さが揃う */
   .gallery {
-    --card-size: 240px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--card-size), 1fr));
-    gap: 20px;
-    align-content: start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
   }
 
   .card {
+    flex: 0 0 auto;
     display: block;
+    color: inherit;
   }
 
   .card-img {
     width: 100%;
     height: auto;
+    display: block;
     border: 1px solid var(--color-border);
     border-radius: 4px;
   }
@@ -181,27 +195,62 @@ const formatDate = (d: Date) =>
     font-size: 0.86rem;
   }
 
-  /* --- 詳細サイドバー --- */
-  .detail-sidebar {
-    position: sticky;
-    top: calc(var(--header-height) + 20px);
+  /* --- 詳細パネル（固定配置・ホバー/タップ時のみ表示） --- */
+  .detail {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    background: var(--color-bg);
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.12);
+    /* 既定（狭い画面・スマホ）: 下部のボトムシート */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-top: 1px solid var(--color-border);
+    padding: 16px 20px 20px;
+    max-height: 55vh;
+    overflow-y: auto;
   }
 
-  .detail-inner {
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    padding: 16px;
-    min-height: 160px;
+  .detail.is-open {
+    display: block;
   }
 
-  .detail-empty {
-    margin: 0;
+  .detail-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    line-height: 1;
     color: var(--color-muted);
-    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  /* 広い画面: 中央コンテンツ右側の余白に配置（重なりなし） */
+  @media (min-width: 1640px) {
+    .detail {
+      left: auto;
+      bottom: auto;
+      right: 16px;
+      top: calc(var(--header-height) + 20px);
+      width: 260px;
+      border: 1px solid var(--color-border);
+      border-top: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: calc(100vh - var(--header-height) - 60px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-close {
+      display: none;
+    }
   }
 
   .detail-title {
-    margin: 0 0 12px;
+    margin: 0 24px 12px 0;
     line-height: 1.5;
   }
 
@@ -229,61 +278,133 @@ const formatDate = (d: Date) =>
   .detail-body:empty {
     display: none;
   }
-
-  @media (max-width: 720px) {
-    .pub-layout {
-      grid-template-columns: 1fr;
-    }
-
-    .detail-sidebar {
-      position: static;
-    }
-  }
 </style>
 
 <script>
+  const GAP = 16;
   const gallery = document.getElementById('gallery');
   const slider = document.getElementById('size-slider') as HTMLInputElement | null;
   const tagSelect = document.getElementById('tag-filter') as HTMLSelectElement | null;
-  const emptyState = document.getElementById('detail-empty');
+  const detail = document.getElementById('detail');
+  const closeBtn = document.getElementById('detail-close');
   const panels = Array.from(document.querySelectorAll<HTMLElement>('.detail-panel'));
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
 
-  // 表示サイズスライダー: グリッドの --card-size を変更
-  if (slider && gallery) {
-    const applySize = () =>
-      gallery.style.setProperty('--card-size', `${slider.value}px`);
-    slider.addEventListener('input', applySize);
-    applySize();
-  }
+  // --- Justified レイアウト ---
+  function layoutGallery() {
+    if (!gallery || !slider) return;
+    const containerWidth = gallery.clientWidth;
+    if (containerWidth <= 0) return;
+    const targetHeight = Number(slider.value);
+    const visible = cards.filter((card) => !card.hidden);
 
-  // タグの絞り込み（ドロップダウン）
-  if (tagSelect) {
-    tagSelect.addEventListener('change', () => {
-      const tag = tagSelect.value;
-      cards.forEach((card) => {
-        const tags = (card.dataset.tags ?? '').split(' ');
-        card.hidden = !(tag === '__all' || tags.includes(tag));
+    let row: HTMLElement[] = [];
+    let aspectSum = 0;
+
+    const flushRow = (isLast: boolean) => {
+      if (!row.length) return;
+      const gaps = (row.length - 1) * GAP;
+      let height: number;
+      if (isLast) {
+        const naturalWidth = aspectSum * targetHeight + gaps;
+        height =
+          naturalWidth > containerWidth
+            ? (containerWidth - gaps) / aspectSum
+            : targetHeight;
+      } else {
+        height = (containerWidth - gaps) / aspectSum;
+      }
+      let usedWidth = 0;
+      row.forEach((card, i) => {
+        const aspect = Number(card.dataset.aspect) || 1;
+        let w = Math.floor(aspect * height);
+        if (!isLast && i === row.length - 1) {
+          w = containerWidth - gaps - usedWidth - 1;
+        }
+        card.style.width = `${w}px`;
+        usedWidth += w;
       });
+      row = [];
+      aspectSum = 0;
+    };
+
+    visible.forEach((card) => {
+      const aspect = Number(card.dataset.aspect) || 1;
+      row.push(card);
+      aspectSum += aspect;
+      const gaps = (row.length - 1) * GAP;
+      if (aspectSum * targetHeight + gaps >= containerWidth) {
+        flushRow(false);
+      }
+    });
+    flushRow(true);
+  }
+
+  slider?.addEventListener('input', layoutGallery);
+
+  tagSelect?.addEventListener('change', () => {
+    const tag = tagSelect.value;
+    cards.forEach((card) => {
+      const tags = (card.dataset.tags ?? '').split(' ');
+      card.hidden = !(tag === '__all' || tags.includes(tag));
+    });
+    layoutGallery();
+  });
+
+  let resizeTimer: number | undefined;
+  window.addEventListener('resize', () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(layoutGallery, 120);
+  });
+  window.addEventListener('load', layoutGallery);
+  layoutGallery();
+
+  // --- 詳細パネルの表示制御 ---
+  const isHover = window.matchMedia('(hover: hover)').matches;
+
+  const showDetail = (id: string | undefined) => {
+    let found = false;
+    panels.forEach((panel) => {
+      const match = panel.dataset.id === id;
+      panel.hidden = !match;
+      if (match) found = true;
+    });
+    detail?.classList.toggle('is-open', found);
+  };
+  const hideDetail = () => {
+    panels.forEach((panel) => (panel.hidden = true));
+    detail?.classList.remove('is-open');
+  };
+
+  cards.forEach((card) => {
+    if (isHover) {
+      // マウス: ホバーで表示
+      card.addEventListener('mouseenter', () => showDetail(card.dataset.id));
+    } else {
+      // タッチ: タップで表示（リンク遷移は抑制）
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        showDetail(card.dataset.id);
+      });
+    }
+  });
+
+  if (isHover) {
+    gallery?.addEventListener('mouseleave', hideDetail);
+  } else {
+    // タッチ: パネル外タップで閉じる
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (
+        detail?.classList.contains('is-open') &&
+        target instanceof Element &&
+        !target.closest('.detail') &&
+        !target.closest('.card')
+      ) {
+        hideDetail();
+      }
     });
   }
 
-  // ホバーで詳細を右サイドバーに表示
-  const showPanel = (id: string | undefined) => {
-    let matched = false;
-    panels.forEach((panel) => {
-      const isMatch = panel.dataset.id === id;
-      panel.hidden = !isMatch;
-      if (isMatch) matched = true;
-    });
-    if (emptyState) emptyState.hidden = matched;
-  };
-  const clearPanels = () => {
-    panels.forEach((panel) => (panel.hidden = true));
-    if (emptyState) emptyState.hidden = false;
-  };
-  cards.forEach((card) => {
-    card.addEventListener('mouseenter', () => showPanel(card.dataset.id));
-  });
-  gallery?.addEventListener('mouseleave', clearPanels);
+  closeBtn?.addEventListener('click', hideDetail);
 </script>

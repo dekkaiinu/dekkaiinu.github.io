@@ -32,7 +32,8 @@ const publications = defineCollection({
       date: z.coerce.date(),
       title: z.string(),
       image: image(),
-      link: z.string().url(),
+      // link: 任意。無い業績は省略可。
+      link: z.string().url().optional(),
     }),
 });
 

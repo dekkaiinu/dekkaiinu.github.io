@@ -24,13 +24,13 @@ export const profile = {
 export const tagFilters: { value: string; label: string }[] = [
   { value: 'journal', label: 'Journal' },
   { value: 'conference', label: 'Conference' },
+  { value: 'award', label: 'Award' },
+  { value: 'dataset', label: 'Dataset' },
 ];
 
 /** Publication ページのUIラベル（言語に関わらず英語表記） */
 export const pubUI = {
   all: 'All',
-  size: 'Size',
-  empty: 'Hover over a card to see its details.',
   tags: 'Tags',
   date: 'Date',
   link: 'Link',
