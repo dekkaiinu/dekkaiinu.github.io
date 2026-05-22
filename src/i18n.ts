@@ -7,13 +7,13 @@ export const profile = {
   /** 名前: ヘッダーで英字・日本語を分けて表示 */
   name: { en: 'Youta Noboru', ja: '昇 洋太' },
   /** ページタイトル等で使う氏名 */
-  fullName: 'Youta Noboru / 昇 洋太',
+  fullName: 'Youta Noboru  /  昇 洋太',
   /** 連絡先メールアドレス */
   email: '26udc07@ms.dendai.ac.jp',
   /** リンク: ここに追記すれば自動で増やせます */
   links: [
-    { url: 'https://github.com/dekkaiinu', label: 'github.com/dekkaiinu' },
-    { url: 'https://033lab.org/', label: '033lab.org' },
+    { url: 'https://github.com/dekkaiinu', label: '/github.com/dekkaiinu' },
+    { url: 'https://033lab.org/', label: '/033lab.org' },
   ],
 };
 
@@ -56,23 +56,23 @@ export const t: Record<Lang, LangText> = {
     sections: { contact: '連絡先', links: 'リンク', career: '経歴' },
     career: [
       {
-        period: '2026/06〜',
+        period: '2026/06 - ',
         org: '東京電機大学 先端科学技術研究科 情報通信メディア専攻',
       },
       {
-        period: '2026/04〜',
+        period: '2026/04 - ',
         org: '産業技術総合研究所（AIST） 技術研修インターンシップ',
       },
       {
-        period: '2025/04〜',
+        period: '2025/04 - ',
         org: '株式会社セルシス 研究開発課 インターンシップ',
       },
       {
-        period: '2024/04〜2026/03',
+        period: '2024/04 - 2026/03',
         org: '東京電機大学 システムデザイン工学研究科 情報システム工学専攻（修士）',
       },
       {
-        period: '2024/01〜2025/12',
+        period: '2024/01 - 2025/12',
         org: '国立がん研究センター 生物情報学分野 特任研究補助員',
       },
     ],

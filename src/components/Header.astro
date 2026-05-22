@@ -10,6 +10,7 @@ const { lang, current } = Astro.props;
 const tt = t[lang];
 const path = current === 'home' ? '/' : '/publication/';
 const other: Lang = lang === 'jp' ? 'en' : 'jp';
+const hasControls = Astro.slots.has('controls');
 ---
 
 <header class="site-header">
@@ -20,9 +21,13 @@ const other: Lang = lang === 'jp' ? 'en' : 'jp';
       <span class="name-ja">{profile.name.ja}</span>
     </a>
 
-    <div class="header-controls">
-      <slot name="controls" />
-    </div>
+    {
+      hasControls && (
+        <div class="header-controls">
+          <slot name="controls" />
+        </div>
+      )
+    }
 
     <nav class="header-nav">
       <a href={`/${lang}/`} class:list={['tab', { active: current === 'home' }]}>
@@ -48,14 +53,16 @@ const other: Lang = lang === 'jp' ? 'en' : 'jp';
     background: var(--color-bg);
   }
 
+  /* flex-wrap で狭い画面でも横にはみ出さない */
   .header-inner {
     max-width: var(--site-width);
     margin: 0 auto;
-    padding: 16px 24px;
+    padding: 14px 24px;
     display: flex;
     align-items: center;
-    gap: 24px;
-    min-height: 80px;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    min-height: 76px;
   }
 
   /* 名前: 英字を大きく、日本語を相対的に小さく */
@@ -82,14 +89,15 @@ const other: Lang = lang === 'jp' ? 'en' : 'jp';
     min-width: 0;
   }
 
+  /* タブ: 右寄せ（コントロール欄の有無に関わらず機能） */
   .header-nav {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
     flex-shrink: 0;
+    margin-left: auto;
   }
 
-  /* タブ: 通常はグレー文字、選択中は黒文字（背景は付けない） */
   .tab {
     color: var(--color-muted);
     font-size: 1.05rem;
@@ -102,5 +110,34 @@ const other: Lang = lang === 'jp' ? 'en' : 'jp';
   .lang-switch {
     color: var(--color-muted);
     font-size: 1rem;
+  }
+
+  /* 中画面: コントロール欄（タグ・サイズ）を2段目へ折り返す */
+  @media (max-width: 860px) {
+    .header-nav {
+      order: 1;
+    }
+
+    .header-controls {
+      order: 2;
+      flex: 0 0 100%;
+    }
+  }
+
+  /* スマホ: 名前を縮小し、名前＋タブを1段目に収める */
+  @media (max-width: 480px) {
+    .header-inner {
+      padding: 12px 16px;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .site-name {
+      font-size: 1.1rem;
+    }
+
+    .header-nav {
+      gap: 12px;
+    }
   }
 </style>
