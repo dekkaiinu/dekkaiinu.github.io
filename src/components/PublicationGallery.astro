@@ -1,0 +1,314 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Header from './Header.astro';
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const tt = t[lang];
+
+// 業績を日付の新しい順に取得
+const publications = (await getCollection('publications')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// 全タグ（重複なし・昇順）
+const allTags = [...new Set(publications.flatMap((p) => p.data.tag))].sort();
+
+// 各業績の本文（その他）をレンダリング
+const entries = await Promise.all(
+  publications.map(async (p) => ({
+    entry: p,
+    Content: (await render(p)).Content,
+  }))
+);
+
+const formatDate = (d: Date) =>
+  `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(
+    d.getDate()
+  ).padStart(2, '0')}`;
+---
+
+<Header lang={lang} current="publication">
+  <div slot="controls" class="pub-controls">
+    <div class="tag-filter">
+      <button type="button" class="tag-btn active" data-tag="__all">
+        {tt.pub.all}
+      </button>
+      {
+        allTags.map((tag) => (
+          <button type="button" class="tag-btn" data-tag={tag}>
+            {tag}
+          </button>
+        ))
+      }
+    </div>
+    <label class="size-control">
+      <span>{tt.pub.size}</span>
+      <input type="range" id="size-slider" min="150" max="420" step="10" value="240" />
+    </label>
+  </div>
+</Header>
+
+<div class="pub-layout">
+  <main class="gallery" id="gallery">
+    {
+      publications.map((p) => (
+        <a
+          class="card"
+          href={p.data.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-id={p.id}
+          data-tags={p.data.tag.join(' ')}
+        >
+          <Image class="card-img" src={p.data.image} alt={p.data.title} />
+          <div class="card-meta">
+            <span class="card-tags">
+              {p.data.tag.map((tg) => (
+                <span class="card-tag">{tg}</span>
+              ))}
+            </span>
+            <span class="card-title">{p.data.title}</span>
+          </div>
+        </a>
+      ))
+    }
+  </main>
+
+  <aside class="detail-sidebar">
+    <div class="detail-inner">
+      <p class="detail-empty" id="detail-empty">{tt.pub.empty}</p>
+      {
+        entries.map(({ entry, Content }) => (
+          <div class="detail-panel" data-id={entry.id} hidden>
+            <p class="detail-title">{entry.data.title}</p>
+            <dl class="detail-list">
+              <dt>{tt.pub.tags}</dt>
+              <dd>{entry.data.tag.join(', ')}</dd>
+              <dt>{tt.pub.date}</dt>
+              <dd>{formatDate(entry.data.date)}</dd>
+              <dt>{tt.pub.link}</dt>
+              <dd>
+                <a href={entry.data.link} target="_blank" rel="noopener noreferrer">
+                  {entry.data.link}
+                </a>
+              </dd>
+            </dl>
+            <div class="detail-body">
+              <Content />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </aside>
+</div>
+
+<style>
+  /* --- ヘッダ内のコントロール（タグフィルタ + サイズスライダー） --- */
+  .pub-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .tag-filter {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag-btn {
+    padding: 3px 10px;
+    font: inherit;
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    background: var(--color-chip);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .tag-btn.active {
+    color: #fff;
+    background: var(--color-text);
+  }
+
+  .size-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  /* --- 本体レイアウト（ギャラリー + 詳細サイドバー） --- */
+  .pub-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    padding: 20px;
+    align-items: start;
+  }
+
+  /* ページ幅ぴったりに充填する可変グリッド。--card-size をスライダーで変更 */
+  .gallery {
+    --card-size: 240px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--card-size), 1fr));
+    gap: 20px;
+    align-content: start;
+  }
+
+  .card {
+    display: block;
+  }
+
+  .card-img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+  }
+
+  /* 画像の下: タグとタイトルを横並び、収まらなければ折り返し */
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    margin-top: 8px;
+  }
+
+  .card-tag {
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    background: var(--color-chip);
+    border-radius: 999px;
+    padding: 1px 8px;
+    margin-right: 4px;
+  }
+
+  .card-title {
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+
+  /* --- 詳細サイドバー --- */
+  .detail-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 20px);
+  }
+
+  .detail-inner {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 16px;
+    min-height: 160px;
+  }
+
+  .detail-empty {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+
+  .detail-title {
+    margin: 0 0 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .detail-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    margin: 0;
+    font-size: 0.84rem;
+  }
+
+  .detail-list dt {
+    color: var(--color-muted);
+  }
+
+  .detail-list dd {
+    margin: 0;
+    word-break: break-word;
+  }
+
+  .detail-body {
+    font-size: 0.84rem;
+  }
+
+  .detail-body:empty {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .pub-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .detail-sidebar {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  const gallery = document.getElementById('gallery');
+  const slider = document.getElementById('size-slider') as HTMLInputElement | null;
+  const emptyState = document.getElementById('detail-empty');
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('.detail-panel'));
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
+  const tagButtons = Array.from(document.querySelectorAll<HTMLElement>('.tag-btn'));
+
+  // 表示サイズスライダー: グリッドの --card-size を変更
+  if (slider && gallery) {
+    const applySize = () =>
+      gallery.style.setProperty('--card-size', `${slider.value}px`);
+    slider.addEventListener('input', applySize);
+    applySize();
+  }
+
+  // タグフィルタ
+  tagButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tagButtons.forEach((b) => b.classList.toggle('active', b === btn));
+      const tag = btn.dataset.tag;
+      cards.forEach((card) => {
+        const tags = (card.dataset.tags ?? '').split(' ');
+        const visible = tag === '__all' || (!!tag && tags.includes(tag));
+        card.hidden = !visible;
+      });
+    });
+  });
+
+  // ホバーで詳細を右サイドバーに表示
+  const showPanel = (id: string | undefined) => {
+    let matched = false;
+    panels.forEach((panel) => {
+      const isMatch = panel.dataset.id === id;
+      panel.hidden = !isMatch;
+      if (isMatch) matched = true;
+    });
+    if (emptyState) emptyState.hidden = matched;
+  };
+  const clearPanels = () => {
+    panels.forEach((panel) => (panel.hidden = true));
+    if (emptyState) emptyState.hidden = false;
+  };
+  cards.forEach((card) => {
+    card.addEventListener('mouseenter', () => showPanel(card.dataset.id));
+  });
+  gallery?.addEventListener('mouseleave', clearPanels);
+</script>

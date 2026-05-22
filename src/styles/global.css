@@ -1,0 +1,57 @@
+/* ===== グローバルスタイル ===== */
+:root {
+  /* フォント: 英字は Source Sans Pro、日本語は各OS標準フォントへフォールバック */
+  --font-sans: "Source Sans Pro", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+
+  /* 配色（背景は白のみ / ダークモードなし） */
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-chip: #f1f1f3;
+
+  /* リンクのホバー色: 仮の既定値。ここを変えると全リンクへ反映されます */
+  --link-hover: #2563eb;
+
+  --content-width: 720px;
+  --header-height: 56px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  line-height: 1.3;
+}

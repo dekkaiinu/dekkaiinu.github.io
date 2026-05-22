@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import HomeMain from '../../components/HomeMain.astro';
+import { profile, t } from '../../i18n';
+---
+
+<Layout lang="jp" title={profile.name} description={t.jp.intro}>
+  <Header lang="jp" current="home" />
+  <HomeMain lang="jp" />
+</Layout>

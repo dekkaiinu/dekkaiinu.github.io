@@ -1,0 +1,89 @@
+---
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  current: 'home' | 'publication';
+}
+
+const { lang, current } = Astro.props;
+const tt = t[lang];
+const path = current === 'home' ? '/' : '/publication/';
+---
+
+<header class="site-header">
+  <nav class="tabs">
+    <a href={`/${lang}/`} class:list={['tab', { active: current === 'home' }]}>
+      {tt.nav.home}
+    </a>
+    <a
+      href={`/${lang}/publication/`}
+      class:list={['tab', { active: current === 'publication' }]}
+    >
+      {tt.nav.publication}
+    </a>
+  </nav>
+
+  <div class="header-controls">
+    <slot name="controls" />
+  </div>
+
+  <div class="lang-switch">
+    <a href={`/jp${path}`} class:list={['lang', { active: lang === 'jp' }]}>⇄/jp</a>
+    <a href={`/en${path}`} class:list={['lang', { active: lang === 'en' }]}>⇄/en</a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: var(--header-height);
+    padding: 8px 20px;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .tab {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .tab.active {
+    background: var(--color-chip);
+  }
+
+  .header-controls {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .lang-switch {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .lang-switch .lang {
+    color: var(--color-muted);
+  }
+
+  .lang-switch .lang.active {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+</style>

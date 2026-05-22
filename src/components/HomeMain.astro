@@ -1,0 +1,67 @@
+---
+import { t, profile, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const tt = t[lang];
+---
+
+<main class="home">
+  <img class="photo" src="/images/photo.gif" alt={profile.name} />
+  <h1 class="name">{profile.name}</h1>
+  <p class="affiliation">{tt.affiliation}</p>
+  <p class="intro">{tt.intro}</p>
+  <ul class="links">
+    {
+      profile.links.map((l) => (
+        <li>
+          <a href={l.url} target="_blank" rel="noopener noreferrer">
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</main>
+
+<style>
+  .home {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 56px 20px;
+  }
+
+  .photo {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .name {
+    margin: 28px 0 6px;
+    font-size: 1.6rem;
+  }
+
+  .affiliation {
+    margin: 0 0 20px;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+
+  .intro {
+    margin: 0 0 28px;
+  }
+
+  .links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+</style>

@@ -1,0 +1,9 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PublicationGallery from '../../components/PublicationGallery.astro';
+import { profile } from '../../i18n';
+---
+
+<Layout lang="jp" title={`Publication | ${profile.name}`}>
+  <PublicationGallery lang="jp" />
+</Layout>
