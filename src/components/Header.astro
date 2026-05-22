@@ -1,5 +1,5 @@
 ---
-import { t, type Lang } from '../i18n';
+import { t, profile, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -9,59 +9,54 @@ interface Props {
 const { lang, current } = Astro.props;
 const tt = t[lang];
 const path = current === 'home' ? '/' : '/publication/';
+const other: Lang = lang === 'jp' ? 'en' : 'jp';
 ---
 
 <header class="site-header">
-  <nav class="tabs">
-    <a href={`/${lang}/`} class:list={['tab', { active: current === 'home' }]}>
-      {tt.nav.home}
-    </a>
-    <a
-      href={`/${lang}/publication/`}
-      class:list={['tab', { active: current === 'publication' }]}
-    >
-      {tt.nav.publication}
-    </a>
-  </nav>
+  <div class="header-inner">
+    <a class="site-name" href={`/${lang}/`}>{profile.name}</a>
 
-  <div class="header-controls">
-    <slot name="controls" />
-  </div>
+    <div class="header-controls">
+      <slot name="controls" />
+    </div>
 
-  <div class="lang-switch">
-    <a href={`/jp${path}`} class:list={['lang', { active: lang === 'jp' }]}>⇄/jp</a>
-    <a href={`/en${path}`} class:list={['lang', { active: lang === 'en' }]}>⇄/en</a>
+    <nav class="header-nav">
+      <a href={`/${lang}/`} class:list={['tab', { active: current === 'home' }]}>
+        {tt.nav.home}
+      </a>
+      <a
+        href={`/${lang}/publication/`}
+        class:list={['tab', { active: current === 'publication' }]}
+      >
+        {tt.nav.publication}
+      </a>
+      <a class="lang-switch" href={`/${other}${path}`}>⇄/{other}</a>
+    </nav>
   </div>
 </header>
 
 <style>
+  /* ヘッダー: 内容と同じ最大幅に揃える。境界線なし・縦幅広め */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 10;
+    background: var(--color-bg);
+  }
+
+  .header-inner {
+    max-width: var(--site-width);
+    margin: 0 auto;
+    padding: 14px 24px;
     display: flex;
     align-items: center;
-    gap: 16px;
-    min-height: var(--header-height);
-    padding: 8px 20px;
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
+    gap: 24px;
+    min-height: 76px;
   }
 
-  .tabs {
-    display: flex;
-    gap: 4px;
+  .site-name {
     flex-shrink: 0;
-  }
-
-  .tab {
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-weight: 600;
-  }
-
-  .tab.active {
-    background: var(--color-chip);
+    font-size: 1.05rem;
   }
 
   .header-controls {
@@ -71,19 +66,24 @@ const path = current === 'home' ? '/' : '/publication/';
     min-width: 0;
   }
 
-  .lang-switch {
+  .header-nav {
     display: flex;
-    gap: 10px;
-    font-size: 0.9rem;
+    align-items: center;
+    gap: 16px;
     flex-shrink: 0;
   }
 
-  .lang-switch .lang {
+  /* タブ: 通常はグレー文字、選択中は黒文字（背景は付けない） */
+  .tab {
     color: var(--color-muted);
   }
 
-  .lang-switch .lang.active {
+  .tab.active {
     color: var(--color-text);
-    font-weight: 600;
+  }
+
+  .lang-switch {
+    color: var(--color-muted);
+    font-size: 0.9rem;
   }
 </style>

@@ -7,61 +7,91 @@ interface Props {
 
 const { lang } = Astro.props;
 const tt = t[lang];
+const aff = tt.affiliation;
 ---
 
 <main class="home">
-  <img class="photo" src="/images/photo.gif" alt={profile.name} />
-  <h1 class="name">{profile.name}</h1>
-  <p class="affiliation">{tt.affiliation}</p>
-  <p class="intro">{tt.intro}</p>
-  <ul class="links">
-    {
-      profile.links.map((l) => (
-        <li>
-          <a href={l.url} target="_blank" rel="noopener noreferrer">
-            {l.label}
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <img class="photo" src="/images/photo.gif" alt="" />
+  <div class="home-text">
+    <p class="affiliation">
+      {
+        aff.parts.map((part, i) => (
+          <Fragment>
+            {i > 0 ? aff.separator : ''}
+            {part.url ? (
+              <a href={part.url} target="_blank" rel="noopener noreferrer">{part.text}</a>
+            ) : (
+              part.text
+            )}
+          </Fragment>
+        ))
+      }
+    </p>
+    <p class="intro">{tt.intro}</p>
+    <ul class="links">
+      {
+        profile.links.map((l) => (
+          <li>
+            <a href={l.url} target="_blank" rel="noopener noreferrer">
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </main>
 
 <style>
+  /* 縦長(5:1)の画像を左に、テキストを右（上揃え）に配置 */
   .home {
-    max-width: var(--content-width);
+    max-width: var(--site-width);
     margin: 0 auto;
-    padding: 56px 20px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 44px;
   }
 
   .photo {
-    width: 160px;
-    height: 160px;
+    flex-shrink: 0;
+    width: 200px;
+    aspect-ratio: 1 / 5;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
   }
 
-  .name {
-    margin: 28px 0 6px;
-    font-size: 1.6rem;
+  .home-text {
+    min-width: 0;
   }
 
   .affiliation {
-    margin: 0 0 20px;
+    margin: 0 0 18px;
     color: var(--color-muted);
     font-size: 0.95rem;
   }
 
   .intro {
-    margin: 0 0 28px;
+    margin: 0 0 22px;
   }
 
   .links {
-    list-style: none;
     margin: 0;
     padding: 0;
+    list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+  }
+
+  @media (max-width: 560px) {
+    .home {
+      gap: 24px;
+      padding: 32px 20px;
+    }
+
+    .photo {
+      width: 120px;
+    }
   }
 </style>

@@ -2,22 +2,18 @@
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Header from './Header.astro';
-import { t, type Lang } from '../i18n';
+import { pubUI, tagFilters, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
 }
 
 const { lang } = Astro.props;
-const tt = t[lang];
 
 // 業績を日付の新しい順に取得
 const publications = (await getCollection('publications')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-
-// 全タグ（重複なし・昇順）
-const allTags = [...new Set(publications.flatMap((p) => p.data.tag))].sort();
 
 // 各業績の本文（その他）をレンダリング
 const entries = await Promise.all(
@@ -35,20 +31,12 @@ const formatDate = (d: Date) =>
 
 <Header lang={lang} current="publication">
   <div slot="controls" class="pub-controls">
-    <div class="tag-filter">
-      <button type="button" class="tag-btn active" data-tag="__all">
-        {tt.pub.all}
-      </button>
-      {
-        allTags.map((tag) => (
-          <button type="button" class="tag-btn" data-tag={tag}>
-            {tag}
-          </button>
-        ))
-      }
-    </div>
+    <select id="tag-filter" class="tag-select" aria-label={pubUI.tags}>
+      <option value="__all">{pubUI.all}</option>
+      {tagFilters.map((f) => <option value={f.value}>{f.label}</option>)}
+    </select>
     <label class="size-control">
-      <span>{tt.pub.size}</span>
+      <span>{pubUI.size}</span>
       <input type="range" id="size-slider" min="150" max="420" step="10" value="240" />
     </label>
   </div>
@@ -82,17 +70,17 @@ const formatDate = (d: Date) =>
 
   <aside class="detail-sidebar">
     <div class="detail-inner">
-      <p class="detail-empty" id="detail-empty">{tt.pub.empty}</p>
+      <p class="detail-empty" id="detail-empty">{pubUI.empty}</p>
       {
         entries.map(({ entry, Content }) => (
           <div class="detail-panel" data-id={entry.id} hidden>
             <p class="detail-title">{entry.data.title}</p>
             <dl class="detail-list">
-              <dt>{tt.pub.tags}</dt>
+              <dt>{pubUI.tags}</dt>
               <dd>{entry.data.tag.join(', ')}</dd>
-              <dt>{tt.pub.date}</dt>
+              <dt>{pubUI.date}</dt>
               <dd>{formatDate(entry.data.date)}</dd>
-              <dt>{tt.pub.link}</dt>
+              <dt>{pubUI.link}</dt>
               <dd>
                 <a href={entry.data.link} target="_blank" rel="noopener noreferrer">
                   {entry.data.link}
@@ -110,7 +98,7 @@ const formatDate = (d: Date) =>
 </div>
 
 <style>
-  /* --- ヘッダ内のコントロール（タグフィルタ + サイズスライダー） --- */
+  /* --- ヘッダ内のコントロール（タグドロップダウン + サイズスライダー） --- */
   .pub-controls {
     display: flex;
     align-items: center;
@@ -120,43 +108,34 @@ const formatDate = (d: Date) =>
     flex-wrap: wrap;
   }
 
-  .tag-filter {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .tag-btn {
-    padding: 3px 10px;
+  .tag-select {
     font: inherit;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: var(--color-muted);
-    background: var(--color-chip);
-    border: 1px solid transparent;
-    border-radius: 999px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 4px 26px 4px 10px;
     cursor: pointer;
-  }
-
-  .tag-btn.active {
-    color: #fff;
-    background: var(--color-text);
   }
 
   .size-control {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: var(--color-muted);
     white-space: nowrap;
   }
 
-  /* --- 本体レイアウト（ギャラリー + 詳細サイドバー） --- */
+  /* --- 本体レイアウト（ギャラリー + 詳細サイドバー）。ヘッダーと同じ最大幅 --- */
   .pub-layout {
+    max-width: var(--site-width);
+    margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 300px;
     gap: 24px;
-    padding: 20px;
+    padding: 20px 24px;
     align-items: start;
   }
 
@@ -200,7 +179,6 @@ const formatDate = (d: Date) =>
 
   .card-title {
     font-size: 0.86rem;
-    font-weight: 600;
   }
 
   /* --- 詳細サイドバー --- */
@@ -224,8 +202,7 @@ const formatDate = (d: Date) =>
 
   .detail-title {
     margin: 0 0 12px;
-    font-weight: 600;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 
   .detail-list {
@@ -267,10 +244,10 @@ const formatDate = (d: Date) =>
 <script>
   const gallery = document.getElementById('gallery');
   const slider = document.getElementById('size-slider') as HTMLInputElement | null;
+  const tagSelect = document.getElementById('tag-filter') as HTMLSelectElement | null;
   const emptyState = document.getElementById('detail-empty');
   const panels = Array.from(document.querySelectorAll<HTMLElement>('.detail-panel'));
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
-  const tagButtons = Array.from(document.querySelectorAll<HTMLElement>('.tag-btn'));
 
   // 表示サイズスライダー: グリッドの --card-size を変更
   if (slider && gallery) {
@@ -280,18 +257,16 @@ const formatDate = (d: Date) =>
     applySize();
   }
 
-  // タグフィルタ
-  tagButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      tagButtons.forEach((b) => b.classList.toggle('active', b === btn));
-      const tag = btn.dataset.tag;
+  // タグの絞り込み（ドロップダウン）
+  if (tagSelect) {
+    tagSelect.addEventListener('change', () => {
+      const tag = tagSelect.value;
       cards.forEach((card) => {
         const tags = (card.dataset.tags ?? '').split(' ');
-        const visible = tag === '__all' || (!!tag && tags.includes(tag));
-        card.hidden = !visible;
+        card.hidden = !(tag === '__all' || tags.includes(tag));
       });
     });
-  });
+  }
 
   // ホバーで詳細を右サイドバーに表示
   const showPanel = (id: string | undefined) => {
