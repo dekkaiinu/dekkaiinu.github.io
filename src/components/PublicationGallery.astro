@@ -83,6 +83,12 @@ const formatDate = (d: Date) =>
           <dl class="detail-list">
             <dt>{pubUI.tags}</dt>
             <dd>{entry.data.tag.join(', ')}</dd>
+            {entry.data.venue && (
+              <Fragment>
+                <dt>{pubUI.venue}</dt>
+                <dd>{entry.data.venue}</dd>
+              </Fragment>
+            )}
             <dt>{pubUI.date}</dt>
             <dd>{formatDate(entry.data.date)}</dd>
             {entry.data.link && (
@@ -187,13 +193,19 @@ const formatDate = (d: Date) =>
     margin-top: 8px;
   }
 
+  /* タグはカード内で折り返す（隣カードへのはみ出しを防止） */
+  .card-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
   .card-tag {
     font-size: 0.72rem;
     color: var(--color-muted);
     background: var(--color-chip);
     border-radius: 999px;
     padding: 1px 8px;
-    margin-right: 4px;
   }
 
   .card-title {

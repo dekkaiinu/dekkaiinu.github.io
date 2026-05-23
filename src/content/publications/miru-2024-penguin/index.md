@@ -1,6 +1,7 @@
 ---
-tag: [conference, MIRU2024]
-date: 2024/07/01
+tag: [conference, domestic, MIRU]
+venue: "画像の認識・理解シンポジウム"
+date: 2024/08/06
 title: "ハイパースペクトル画像に基づくペンギンの個体識別"
-image: ./cover.png
+image: ./MIRU_2024.gif
 ---

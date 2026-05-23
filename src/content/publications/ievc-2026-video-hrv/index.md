@@ -1,6 +1,7 @@
 ---
-tag: [conference, IEVC]
-date: 2026/03/01
+tag: [conference, international, IEVC]
+venue: "International Conference on Image Electronics and Visual Computing"
+date: 2026/03/16
 title: "Can Video Enhancement Influence Heart Rate Variability?"
-image: ./cover.png
+image: ./IEVC_2026.gif
 ---

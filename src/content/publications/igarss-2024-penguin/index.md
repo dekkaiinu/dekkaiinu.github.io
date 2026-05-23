@@ -1,7 +1,8 @@
 ---
-tag: [conference, IGARSS]
-date: 2024/07/01
+tag: [conference, international, IGARSS]
+venue: "IEEE International Geoscience and Remote Sensing Symposium"
+date: 2024/07/07
 title: "Hyperspectral Image Dataset for Individual Penguin Identification"
-image: ./IGRASS_2024.gif
+image: ./IGARSS_2024.gif
 link: https://033labcodes.github.io/igrass24_penguin/
 ---

@@ -34,6 +34,8 @@ const publications = defineCollection({
       image: image(),
       // link: 任意。無い業績は省略可。
       link: z.string().url().optional(),
+      // venue: 学会・学会誌の正式名称。任意。
+      venue: z.string().optional(),
     }),
 });
 

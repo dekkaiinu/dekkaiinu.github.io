@@ -24,6 +24,8 @@ export const profile = {
 export const tagFilters: { value: string; label: string }[] = [
   { value: 'journal', label: 'Journal' },
   { value: 'conference', label: 'Conference' },
+  { value: 'international', label: 'International' },
+  { value: 'domestic', label: 'Domestic' },
   { value: 'award', label: 'Award' },
   { value: 'dataset', label: 'Dataset' },
 ];
@@ -32,6 +34,7 @@ export const tagFilters: { value: string; label: string }[] = [
 export const pubUI = {
   all: 'All',
   tags: 'Tags',
+  venue: 'Venue',
   date: 'Date',
   link: 'Link',
 };

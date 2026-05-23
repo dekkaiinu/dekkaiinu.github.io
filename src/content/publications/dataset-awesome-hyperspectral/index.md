@@ -1,7 +1,7 @@
 ---
 tag: [dataset]
-date: 2025/01/01
+date: 2025/04/20
 title: "Awesome Hyperspectral Dataset"
-image: ./cover.png
+image: ./dataset.gif
 link: https://github.com/033labcodes/awesome-hyperspectral-datasets
 ---
