@@ -15,6 +15,8 @@ export const profile = {
     { url: 'https://github.com/dekkaiinu', label: '/github.com/dekkaiinu' },
     { url: 'https://033lab.org/', label: '/033lab.org' },
   ],
+  /** Google Scholar 等のプロフィール（構造化データの sameAs に使用） */
+  scholar: 'https://scholar.google.co.jp/citations?hl=ja&user=LtNoEXIAAAAJ',
 };
 
 /**

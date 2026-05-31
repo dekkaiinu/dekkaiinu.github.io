@@ -3,7 +3,7 @@ import '@fontsource/source-sans-pro/300.css';
 import '@fontsource/source-sans-pro/400.css';
 import '@fontsource/source-sans-pro/600.css';
 import '../styles/global.css';
-import { t, type Lang } from '../i18n';
+import { t, profile, languages, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -12,6 +12,32 @@ interface Props {
 }
 
 const { lang, title, description } = Astro.props;
+
+// 正規URL（重複コンテンツ対策）
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// 言語別の代替URL（hreflang）。パス先頭の /jp|/en を各言語へ置換して導出
+const langAlternates = languages.map((l) => ({
+  hreflang: t[l].htmlLang,
+  href: new URL(Astro.url.pathname.replace(/^\/(jp|en)/, `/${l}`), Astro.site).href,
+}));
+
+// 構造化データ: 人物（名前検索でエンティティとして認識させる）
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name.en,
+  alternateName: profile.name.ja,
+  url: new URL('/', Astro.site).href,
+  image: new URL('/images/photo.gif', Astro.site).href,
+  email: `mailto:${profile.email}`,
+  jobTitle: 'Doctoral student',
+  affiliation: {
+    '@type': 'CollegeOrUniversity',
+    name: 'Tokyo Denki University',
+  },
+  sameAs: [...profile.links.map((l) => l.url), profile.scholar],
+};
 ---
 
 <!doctype html>
@@ -22,7 +48,19 @@ const { lang, title, description } = Astro.props;
     <link rel="icon" href="data:," />
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonicalURL.href} />
+    {
+      langAlternates.map((a) => (
+        <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(Astro.url.pathname.replace(/^\/(jp|en)/, '/jp'), Astro.site).href}
+    />
     <title>{title}</title>
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   </head>
   <body>
     <slot />
