@@ -45,6 +45,7 @@ const personLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-site-verification" content="gZ7xn38LhzvR2JiANvyVjfGyqgcSkXwLYvTab6oYUAk" />
     <link rel="icon" href="data:," />
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
@@ -60,7 +61,7 @@ const personLd = {
       href={new URL(Astro.url.pathname.replace(/^\/(jp|en)/, '/jp'), Astro.site).href}
     />
     <title>{title}</title>
-    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personLd)} />
   </head>
   <body>
     <slot />
