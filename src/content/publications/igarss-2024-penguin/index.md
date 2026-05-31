@@ -1,6 +1,7 @@
 ---
 tag: [conference, international, IGARSS]
-venue: "IEEE International Geoscience and Remote Sensing Symposium"
+publication: "IEEE International Geoscience and Remote Sensing Symposium"
+venue: "Athens, Greece"
 date: 2024/07/07
 title: "Hyperspectral Image Dataset for Individual Penguin Identification"
 image: ./IGARSS_2024.gif

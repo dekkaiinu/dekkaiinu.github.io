@@ -1,6 +1,7 @@
 ---
 tag: [conference, international, VISAPP]
-venue: "International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications"
+publication: "International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications"
+venue: "Porto, Portugal"
 date: 2025/02/26
 title: "Anomalous Water Dataset Captured by Hyperspectral Cameras"
 image: ./VISAPP_2025.gif

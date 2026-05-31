@@ -17,6 +17,8 @@ import { glob } from 'astro/loaders';
  *   title: 論文タイトル          # タイトル
  *   image: ./cover.png          # 画像（index.md からの相対パス）
  *   link: https://...           # プロジェクトページ等のURL
+ *   publication: 学会名・雑誌名  # 学会・学会誌の正式名称（任意）
+ *   venue: 開催地               # 開催地・都市名（任意）
  *   ---
  *   （ここから下の本文が「その他」: アブストラクト等。表示は任意）
  */
@@ -34,7 +36,9 @@ const publications = defineCollection({
       image: image(),
       // link: 任意。無い業績は省略可。
       link: z.string().url().optional(),
-      // venue: 学会・学会誌の正式名称。任意。
+      // publication: 学会・学会誌の正式名称。任意。
+      publication: z.string().optional(),
+      // venue: 開催地・都市名。任意。
       venue: z.string().optional(),
     }),
 });

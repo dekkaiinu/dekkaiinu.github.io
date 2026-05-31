@@ -83,6 +83,12 @@ const formatDate = (d: Date) =>
           <dl class="detail-list">
             <dt>{pubUI.tags}</dt>
             <dd>{entry.data.tag.join(', ')}</dd>
+            {entry.data.publication && (
+              <Fragment>
+                <dt>{pubUI.publication}</dt>
+                <dd>{entry.data.publication}</dd>
+              </Fragment>
+            )}
             {entry.data.venue && (
               <Fragment>
                 <dt>{pubUI.venue}</dt>

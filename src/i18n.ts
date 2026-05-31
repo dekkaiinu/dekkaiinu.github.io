@@ -34,6 +34,7 @@ export const tagFilters: { value: string; label: string }[] = [
 export const pubUI = {
   all: 'All',
   tags: 'Tags',
+  publication: 'Publication',
   venue: 'Venue',
   date: 'Date',
   link: 'Link',
@@ -55,16 +56,17 @@ type LangText = {
 export const t: Record<Lang, LangText> = {
   jp: {
     htmlLang: 'ja',
-    intro: '画像とAIの研究をしてます．',
+    intro:
+      '東京電機大学で画像とAIの研究をしている博士課程の学生です．主にハイパースペクトル画像やカメラを扱っています．',
     sections: { contact: '連絡先', links: 'リンク', career: '経歴' },
     career: [
       {
         period: '2026/06 - ',
-        org: '東京電機大学 先端科学技術研究科 情報通信メディア専攻',
+        org: '産業技術総合研究所（AIST） 技術研修インターンシップ',
       },
       {
         period: '2026/04 - ',
-        org: '産業技術総合研究所（AIST） 技術研修インターンシップ',
+        org: '東京電機大学 先端科学技術研究科 情報通信メディア専攻',
       },
       {
         period: '2025/04 - ',
@@ -83,16 +85,17 @@ export const t: Record<Lang, LangText> = {
   },
   en: {
     htmlLang: 'en',
-    intro: 'I research images and AI.',
+    intro:
+      "I'm a doctoral student at Tokyo Denki University researching images and AI. I mainly work with hyperspectral images and cameras.",
     sections: { contact: 'Contact', links: 'Links', career: 'Career' },
     career: [
       {
         period: '2026/06 – Present',
-        org: 'Information, Communication and Media Design Engineering, Graduate School of Advanced Science and Technology, Tokyo Denki University',
+        org: 'Technical Training Internship, National Institute of Advanced Industrial Science and Technology (AIST)',
       },
       {
         period: '2026/04 – Present',
-        org: 'Technical Training Internship, National Institute of Advanced Industrial Science and Technology (AIST)',
+        org: 'Information, Communication and Media Design Engineering, Graduate School of Advanced Science and Technology, Tokyo Denki University',
       },
       {
         period: '2025/04 – Present',
